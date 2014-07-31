@@ -1,0 +1,20 @@
+{
+  "name": "meel-neural-music",
+  "version": "0.0.0",
+  "description": "demo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "b-ma",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "~3.8.6",
+    "browserify": "~5.9.1",
+    "vinyl-source-stream": "~0.1.1"
+  },
+  "dependencies": {
+    "underscore": "~1.6.0",
+    "vector": "git+https://github.com/b-ma/vector2d.git"
+  }
+}
