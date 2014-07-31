@@ -1,5 +1,6 @@
 var Network = require('./app/network')
   , Neuron = require('./app/neuron')
+  , Connection = require('./app/connection')
   , Vector = require('vector')
 ;
 
@@ -28,6 +29,7 @@ var distance = networkWidth / neuronCount;
 for (var i = 0; i <= neuronCount; i++) {
     var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), 0));
     network.addNeuron(neuron);
+    network.connect(inputNeuron, neuron);
 }
 
 (function draw() {

@@ -18,6 +18,7 @@
 var util = require('util')
   , events = require('events')
   , _ = require('underscore')
+  , Connection = require('../app/connection')
 ;
 
 function Network(location, w, h) {
@@ -42,7 +43,7 @@ _.extend(Network.prototype, {
 
     connect: function(neuron1, neuron2) {
         var connection = new Connection(neuron1, neuron2);
-        neuron1.addConnection(neuron2);
+        neuron1.addConnection(connection);
     },
 
     feedForward: function() {
@@ -57,16 +58,15 @@ _.extend(Network.prototype, {
     },
 
     display: function(ctx) {
-        // console.log('draw network');
         ctx.save();
         ctx.translate(this.location.x, this.location.y);
-
-        // draw scene
-        ctx.beginPath();
-        ctx.strokeStyle = '#ffffff';
-        ctx.rect(-this.w / 2, -this.h / 2, this.w, this.h);
-        ctx.stroke();
-        ctx.closePath();
+        /* // draw bounding scene rect
+            ctx.beginPath();
+            ctx.strokeStyle = 'green';
+            ctx.rect(-this.w / 2, -this.h / 2, this.w, this.h);
+            ctx.stroke();
+            ctx.closePath();
+        // */
 
         this.input.display(ctx);
 

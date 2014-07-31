@@ -24,4 +24,4 @@ gulp.task('watch', function() {
 });
 
 // default task
-gulp.task('default', ['watch']);
+gulp.task('default', ['watch', 'browserify']);

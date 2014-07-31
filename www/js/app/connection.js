@@ -18,7 +18,7 @@ var util = require('util')
   , events = require('events')
   , _ = require('underscore')
   , Vector = require('vector')
-  , canvasUtils = require('../lib/canvas-utils')
+  , canvasHelpers = require('../lib/canvas-helpers')
 ;
 
 var messageTimeStep = 0.008;
@@ -31,8 +31,9 @@ function Connection(source, dest) {
 
     events.EventEmitter.call(this);
 
-    this.controlPoint1 = new Vector();
-    this.controlPoint2 = new Vector();
+    var h = this.source.location.y - this.dest.location.y;
+    this.controlPoint1 = new Vector(this.source.location.x, h - (15/8) * h);
+    this.controlPoint2 = new Vector(this.dest.location.x, (11/8) * h);
 }
 
 util.inherits(Connection, events.EventEmitter);
@@ -51,10 +52,10 @@ _.extend(Connection.prototype, {
     update: function() {
         this.messages.forEach(function(messsages) {
             message.timer += messageTimeStep;
-            message.position = canvasUtils.bezier(
+            message.position = canvasHelpers.bezier(
                 this.source,
-                this.controlPoint(1),
-                this.controlPoint(2),
+                this.controlPoint1,
+                this.controlPoint2,
                 this.dest,
                 message.timer
             )
@@ -62,6 +63,46 @@ _.extend(Connection.prototype, {
     },
 
     display: function(ctx) {
-        console.log('draw connection');
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#ffffff';
+
+        ctx.moveTo(this.source.location.x, this.source.location.y);
+        ctx.bezierCurveTo(
+            this.controlPoint1.x, this.controlPoint1.y,
+            this.controlPoint2.x, this.controlPoint2.y,
+            this.dest.location.x, this.dest.location.y
+        );
+
+        ctx.stroke();
+        ctx.closePath();
+
+        /*
+        // draw control points
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.moveTo(this.dest.location.x, this.dest.location.y);
+        ctx.lineTo(this.controlPoint2.x, this.controlPoint2.y);
+        ctx.stroke();
+        ctx.closePath();
+        //
+        ctx.beginPath();
+        ctx.strokeStyle = 'green';
+        ctx.moveTo(this.source.location.x, this.source.location.y);
+        ctx.lineTo(this.controlPoint1.x, this.controlPoint1.y);
+        ctx.stroke();
+        ctx.closePath();
+        // */
+        ctx.restore();
     }
 });
+
+module.exports = Connection;
+
+
+
+
+
+
+
+
