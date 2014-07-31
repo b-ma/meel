@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Bezier curves</title>
+    <style>
+        body {
+            background-color: #000000;
+        }
+
+        canvas {
+            display: block;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="scene"></canvas>
+
+    <script src="./lib/extend.js"></script>
+    <script src="./lib/vector.js"></script>
+    <script>
+        var w = 601, h = 200;
+        var canvas = document.getElementById('scene');
+        var ctx = canvas.getContext('2d');
+
+        ctx.canvas.width = w;
+        ctx.canvas.height = h;
+
+        // for (var method in ctx) {
+        // console.log(method);
+        // }
+
+        var step = 20;
+        var paths = (w - 1) / step;
+
+        var startPoint = new Vector(0, h);
+
+        // global styles
+        // var grad = ctx.createLinearGradient(0, 0, w, 0);
+        // grad.addColorStop(0, '#454545');
+        // grad.addColorStop(1, '#ffffff');
+        // grad.addColorStop(1, '#808080');
+        //*
+        // ctx.lineWidth = 2;
+        // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial/Applying_styles_and_colors#A_lineWidth_example
+        ctx.translate(0.5, 0);
+        // */
+
+        var counter = 0;
+        var counterStep = Math.PI / 5000;
+
+        function bezier(p0, p1, p2, p3, t) {
+            var u = 1 - t;
+            var tt = t * t;
+            var uu = u * u;
+            var ttt = tt * t;
+            var uuu = uu * u;
+
+            var p = p0.clone().multiply(uuu); //
+            p.add(p1.clone().multiply(3 * uu * t));
+            p.add(p2.clone().multiply(3 * u * tt));
+            p.add(p3.clone().multiply(ttt));
+
+            return p;
+        }
+
+        var t = 0;
+
+        (function draw() {
+            ctx.clearRect(0, 0, w, h);
+
+            // update startPoint
+            counter = (counter + counterStep) % (Math.PI * 2);
+            var sin = Math.sin(counter);
+            startPoint.x = sin * (w / 16) + (w / 2) - 1;
+            // update gradient position
+            var grad = ctx.createRadialGradient(startPoint.x, h / 2, 0, startPoint.x, h / 2, w / 2);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(1, '#505090');
+            ctx.strokeStyle = grad;
+            // store controlPoints and enPoint of each bezier curve
+            var points = [];
+
+            for (var i = 0; i <= paths; i++) {
+                var endPoint = new Vector(i * step, 0);
+                var controlPoint1 = new Vector(startPoint.x, 0 - (2 * h / 3));
+                var controlPoint2 = new Vector(endPoint.x, h + (2 * h / 3));
+                // store points for later use
+                points[i] = [controlPoint1, controlPoint2, endPoint];
+
+                ctx.beginPath();
+                ctx.moveTo(startPoint.x, startPoint.y);
+                ctx.bezierCurveTo(
+                controlPoint1.x, controlPoint1.y,
+                controlPoint2.x, controlPoint2.y,
+                endPoint.x, endPoint.y
+                );
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            // update movers
+            t = (t + 0.008) % 1;
+
+            for (var i = 0; i <= paths; i++) {
+                var position = bezier(startPoint, points[i][0], points[i][1], points[i][2], Math.sqrt(t, 2));
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.fillStyle = 'white';
+                ctx.translate(position.x, position.y);
+                ctx.arc(0, 0, 1.5, 0, Math.PI * 2, false);
+                ctx.fill();
+                ctx.closePath();
+                ctx.restore();
+            }
+
+            window.requestAnimationFrame(draw);
+        }());
+    </script>
+</body>
+</html>
