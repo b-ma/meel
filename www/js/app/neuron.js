@@ -1,5 +1,5 @@
 //  Neuron
-//      location    Vector
+//      position    Vector
 //      connections Array
 //      sum         Int
 //
@@ -20,10 +20,34 @@ var util = require('util')
   , _ = require('underscore')
 ;
 
-function Neuron(location) {
-    this.location = location;
+var interfaces = {
+    // key refers to neuron type
+    input: {
+        // select randomly into connections
+        feedForward: function(value) {
+            this.sum += value;
+
+            var connections = this.connections.slice(0);
+            connections.sort(function() { return Math.random() - 0.5; });
+            connection = connections[0]
+
+            if (this.sum < 1) { return; }
+            connection.feedForward(this.sum);
+            this.sum = 0;
+        }
+    }
+}
+
+
+function Neuron(position, type) {
+    this.position = position;
     this.connections = [];
     this.sum = 0;
+
+    if (interfaces[type]) {
+        var mixin = interfaces[type];
+        for (var method in mixin) { this[method] = mixin[method]; }
+    }
 
     events.EventEmitter.call(this);
 }
@@ -35,11 +59,13 @@ _.extend(Neuron.prototype, {
         this.connections.push(connection);
     },
 
-    feedForward: function() {
+    feedForward: function(value) {
+        this.sum += value;
+
         this.connections.forEach(function(connection) {
             if (this.sum < 1) { return; }
             connection.feedForward(this.sum);
-            this.sum(0);
+            this.sum = 0;
         }, this);
     },
 
@@ -66,7 +92,7 @@ _.extend(Neuron.prototype, {
         ctx.save();
         ctx.beginPath();
         ctx.fillStyle = this.gradient;
-        ctx.translate(this.location.x, this.location.y);
+        ctx.translate(this.position.x, this.position.y);
         // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
         ctx.rect(-4, -1.5, 8, 3);
         ctx.fill();

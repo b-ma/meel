@@ -1,5 +1,5 @@
 //  Network
-//      location Vector
+//      position Vector
 //      neurons  Array
 //      addNeuron
 //          add neuron to `neurons`
@@ -21,8 +21,8 @@ var util = require('util')
   , Connection = require('../app/connection')
 ;
 
-function Network(location, w, h) {
-    this.location = location;
+function Network(position, w, h) {
+    this.position = position;
     this.w = w;
     this.h = h;
     this.neurons = [];
@@ -35,6 +35,7 @@ util.inherits(Network, events.EventEmitter);
 _.extend(Network.prototype, {
     setInput: function(neuron) {
         this.input = neuron;
+        this.addNeuron(neuron);
     },
 
     addNeuron: function(neuron) {
@@ -59,7 +60,7 @@ _.extend(Network.prototype, {
 
     display: function(ctx) {
         ctx.save();
-        ctx.translate(this.location.x, this.location.y);
+        ctx.translate(this.position.x, this.position.y);
         /* // draw bounding scene rect
             ctx.beginPath();
             ctx.strokeStyle = 'green';
@@ -67,9 +68,6 @@ _.extend(Network.prototype, {
             ctx.stroke();
             ctx.closePath();
         // */
-
-        this.input.display(ctx);
-
         this.neurons.forEach(function(neuron) {
             neuron.display(ctx);
         });
