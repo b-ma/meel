@@ -1,3 +1,22 @@
+var colorPicker = {
+    update: function(ctx) {
+        this.w = ctx.canvas.width;
+        this.h = ctx.canvas.height;
+        this.pixels = ctx.getImageData(0, 0, this.w, this.h).data;
+    },
+
+    getColor: function(position) {
+        var color = {
+            r: this.pixels[Math.round((this.w * position.y) + position.x)],
+            g: this.pixels[Math.round((this.w * position.y) + position.x + 1)],
+            b: this.pixels[Math.round((this.w * position.y) + position.x + 2)]
+        };
+
+        return color;
+    }
+}
+
+
 module.exports = {
     constrain: function(value, min, max) {
         if (value > max) { value = max; }
@@ -24,5 +43,7 @@ module.exports = {
         p.add(p3.clone().multiply(ttt));
 
         return p;
-    }
+    },
+
+    colorPicker: colorPicker
 }

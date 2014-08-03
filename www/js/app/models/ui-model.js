@@ -4,6 +4,7 @@ var events = require('events')
 
 var UIModel = function() {
     this.inputPosition = 0.5;
+    // presets [0.57, 0.07] - [1, 0.7] - [0.8, 0.2]
     this.controlPoint1Ratio = 0.5;
     this.controlPoint2Ratio = 0.5;
 

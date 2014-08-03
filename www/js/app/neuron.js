@@ -27,12 +27,10 @@ var interfaces = {
         feedForward: function(value) {
             this.sum += value;
 
-            var connections = this.connections.slice(0);
-            connections.sort(function() { return Math.random() - 0.5; });
-            connection = connections[0]
+            var randomIndex = Math.floor(Math.random() * this.connections.length);
 
-            if (this.sum < 1) { return; }
-            connection.feedForward(this.sum);
+            // if (this.sum < 1) { return; }
+            this.connections[randomIndex].feedForward(this.sum);
             this.sum = 0;
         }
     }
@@ -41,6 +39,7 @@ var interfaces = {
 
 function Neuron(position, type) {
     this.position = position;
+    this.type = type;
     this.connections = [];
     this.sum = 0;
 
@@ -61,12 +60,13 @@ _.extend(Neuron.prototype, {
 
     feedForward: function(value) {
         this.sum += value;
+        if (this.sum < 1) { return; }
 
         this.connections.forEach(function(connection) {
-            if (this.sum < 1) { return; }
             connection.feedForward(this.sum);
-            this.sum = 0;
         }, this);
+
+        this.sum = 0;
     },
 
     update: function() {
@@ -92,6 +92,7 @@ _.extend(Neuron.prototype, {
         ctx.save();
         ctx.beginPath();
         ctx.fillStyle = this.gradient;
+        ctx.globalAlpha = this.sum / 2 + 0.5;
         ctx.translate(this.position.x, this.position.y);
         // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
         ctx.rect(-4, -1.5, 8, 3);

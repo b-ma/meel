@@ -18,11 +18,9 @@ var util = require('util')
   , events = require('events')
   , _ = require('underscore')
   , Vector = require('vector')
-  , canvasHelpers = require('../lib/canvas-helpers')
+  , helpers = require('../lib/canvas-helpers')
   , ui = require('./models/ui-model')
 ;
-
-var messageTimeStep = 0.008;
 
 function Connection(source, dest) {
     this.source = source;
@@ -32,6 +30,7 @@ function Connection(source, dest) {
 
     events.EventEmitter.call(this);
 
+    this.messageTimeStep = Math.random() * 0.008 + 0.004 ;
     this.h = this.source.position.y - this.dest.position.y;
 }
 
@@ -49,9 +48,19 @@ _.extend(Connection.prototype, {
     },
 
     update: function() {
+        // update control points
+        var controlPoint1Y = this.source.position.y - (ui.get('controlPoint1Ratio') * 2 * this.h);
+        var controlPoint2Y = this.dest.position.y + (ui.get('controlPoint2Ratio') * 2 * this.h);
+        this.controlPoint1 = new Vector(this.source.position.x, controlPoint1Y);
+        this.controlPoint2 = new Vector(this.dest.position.x, controlPoint2Y);
+
+        var deadMessages = [];
         this.messages.forEach(function(message) {
-            message.timer += messageTimeStep;
-            message.position = canvasHelpers.bezier(
+            message.timer += this.messageTimeStep;
+
+            if (message.timer >= 1) { return deadMessages.push(message); }
+
+            message.position = helpers.bezier(
                 this.source.position,
                 this.controlPoint1,
                 this.controlPoint2,
@@ -60,16 +69,25 @@ _.extend(Connection.prototype, {
             )
         }, this);
 
-        // update control points
-        this.controlPoint1 = new Vector(this.source.position.x, this.h - ui.get('controlPoint1Ratio') * 2 * this.h);
-        this.controlPoint2 = new Vector(this.dest.position.x, ui.get('controlPoint2Ratio') * 2 * this.h);
+        deadMessages.forEach(function(message) {
+            var index = this.messages.indexOf(message);
+            this.messages.splice(index, 1);
+
+            this.dest.feedForward(message.value);
+        }, this);
     },
 
     display: function(ctx) {
         ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle = '#ffffff';
-        ctx.fillStyle = '#ffffff';
+
+        if (!this.grad) {
+            this.grad = ctx.createRadialGradient(0, 0, 0, 0, 0, this.h);
+            this.grad.addColorStop(0, '#ffffff');
+            this.grad.addColorStop(1, '#505090');
+        }
+
+        ctx.strokeStyle = this.type === 'input' ? '#ffffff' : this.grad;
 
         ctx.moveTo(this.source.position.x, this.source.position.y);
         ctx.bezierCurveTo(
@@ -81,28 +99,38 @@ _.extend(Connection.prototype, {
         ctx.stroke();
         ctx.closePath();
 
+        ctx.save();
         this.messages.forEach(function(message) {
             ctx.beginPath();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.globalAlpha = message.value;
+
             ctx.arc(message.position.x, message.position.y, 2, 0, Math.PI * 2, false);
             ctx.fill();
             ctx.closePath();
-        })
+        });
+        ctx.restore();
+
         /*
-        // draw control points
-        ctx.beginPath();
-        ctx.strokeStyle = 'red';
-        ctx.moveTo(this.dest.position.x, this.dest.position.y);
-        ctx.lineTo(this.controlPoint2.x, this.controlPoint2.y);
-        ctx.stroke();
-        ctx.closePath();
-        //
-        ctx.beginPath();
-        ctx.strokeStyle = 'green';
-        ctx.moveTo(this.source.position.x, this.source.position.y);
-        ctx.lineTo(this.controlPoint1.x, this.controlPoint1.y);
-        ctx.stroke();
-        ctx.closePath();
+        if (this.source.type === 'input') {
+            // draw control points
+            ctx.beginPath();
+            ctx.strokeStyle = 'green';
+            ctx.moveTo(this.source.position.x, this.source.position.y);
+            ctx.lineTo(this.controlPoint1.x, this.controlPoint1.y);
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            ctx.moveTo(this.dest.position.x, this.dest.position.y);
+            ctx.lineTo(this.controlPoint2.x, this.controlPoint2.y);
+            ctx.stroke();
+            ctx.closePath();
+        }
         // */
+
         ctx.restore();
     }
 });
