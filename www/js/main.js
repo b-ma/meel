@@ -21,17 +21,82 @@ ctx.canvas.height = window.innerHeight;
 
 // audio
 var frequencies = {
-    'a': '440',
-    'b': '440',
-    'c': '440',
-    'd': '440',
-    'e': '440',
-    'f': '440',
-    'g': '440'
+    'a': 55,
+    'b': 62,
+    'c': 65,
+    'd': 73,
+    'e': 82,
+    'f': 87,
+    'g': 98
 };
 var notes = Object.keys(frequencies);
 var notesCount = notes.length;
 var noteIndex = 0;
+var audio = new AudioContext();
+var master = audio.createGain();
+master.gain.value = UIModel.get('volume');
+
+var compressor = audio.createDynamicsCompressor();
+
+UIModel.on('change:volume', function(volume) {
+    master.gain.value = volume;
+})
+
+/*
+var processAudio = function(e) {
+    var input = e.inputBuffer.getChannelData(0);
+    var output = e.outputBuffer.getChannelData(0);
+
+    for (var i = 0; i < input.length; i++) {
+        var absValue = Math.abs(input[i]);
+        if (absValue > 1) {
+            output[i] = 1;
+        }
+    }
+}
+
+var meter = audio.createScriptProcessor(1024, 1, 1);
+meter.onaudioprocess = processAudio;
+
+master.connect(meter);
+meter.connect(audio.destination);
+// */
+master.connect(compressor);
+compressor.connect(audio.destination);
+
+var playSound =  function(frequency, strength) {
+    var now = audio.currentTime;
+    var oscillator = audio.createOscillator();
+    var gainNode = audio.createGain();
+
+    oscillator.frequency.value = frequency;
+    oscillator.connect(gainNode);
+    gainNode.connect(master);
+
+    // gainNode.gain.value = 0;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(strength * 0.05, now  + 0.02);
+    gainNode.gain.setTargetAtTime(0.001, now + 0.5, 1);
+    gainNode.gain.setTargetAtTime(0, now + 8, 1);
+
+    oscillator.start(now);
+    oscillator.stop(now + 12);
+
+    gainNode = null;
+    oscillator = null;
+}
+
+//  setTimeout(function() {
+//      playSound(400, 0.8);
+//  }, 1000);
+//  return
+//
+//  var btn = document.querySelector('#test');
+//  btn.addEventListener('click', function() {
+//    playSound(440);
+//  }, false)
+//
+//  return;
 
 // scene
 var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
@@ -83,13 +148,24 @@ for (var i = 0; i < neuronCount; i++) {
     thirdLayer.push(neuron);
 }
 // ball generator
+var lastOctave;
 for (var i = 0; i < neuronCount; i++) {
-    var note = {
-        octave: Math.floor(noteIndex / notesCount),
-        note: notes[noteIndex % notesCount]
-    }
+    var index = notes[noteIndex % notesCount];
 
-    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), note);
+    // ugly - refactor
+    if (lastOctave !== Math.floor(noteIndex / notesCount)) {
+        for (var note in frequencies) {
+            frequencies[note] = frequencies[note] * 2;
+        }
+
+        lastOctave = Math.floor(noteIndex / notesCount)
+    }
+    noteIndex += 1;
+
+    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), frequencies[index]);
+    generator.on('bounce', function(frequency, strength) {
+        playSound.apply(null, arguments);
+    });
     // network.addNeuron(generator);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;
     network.setOutput(thirdLayer[i], generator);

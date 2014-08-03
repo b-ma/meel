@@ -7,6 +7,7 @@ var UIModel = function() {
     // presets [0.57, 0.07] - [1, 0.7] - [0.8, 0.2]
     this.controlPoint1Ratio = 0.5;
     this.controlPoint2Ratio = 0.5;
+    this.volume = 0.5;
 
     events.EventEmitter.call(this);
 };
@@ -31,7 +32,7 @@ var gui = f1 = new dat.GUI();
 var controllers = {};
 // display settings
 // var f1 = gui.addFolder('display settings');
-['inputPosition', 'controlPoint1Ratio', 'controlPoint2Ratio'].forEach(function(setting) {
+['inputPosition', 'controlPoint1Ratio', 'controlPoint2Ratio', 'volume'].forEach(function(setting) {
     controllers[setting] = f1.add(uiModel, setting, 0, 1);
     controllers[setting].onChange(function(value) { uiModel.set(setting, value) })
 });

@@ -57,9 +57,10 @@ _.extend(Network.prototype, {
     },
 
     update: function() {
-        this.neurons.forEach(function(neuron) {
-            neuron.update();
-        });
+        var length = this.neurons.length;
+        for (var i = 0; i < length; i++) {
+            this.neurons[i].update();
+        };
     },
 
     display: function(ctx) {
@@ -72,17 +73,19 @@ _.extend(Network.prototype, {
             ctx.stroke();
             ctx.closePath();
         // */
-        this.neurons.forEach(function(neuron) {
-            neuron.displayConnectionsPaths(ctx);
-        });
+        var length = this.neurons.length;
 
-        this.neurons.forEach(function(neuron) {
-            neuron.displayConnectionsMessages(ctx);
-        });
+        for (var i = 0; i < length; i++) {
+            this.neurons[i].displayConnectionsPaths(ctx);
+        };
 
-        this.neurons.forEach(function(neuron) {
-            neuron.display(ctx);
-        });
+        for (var i = 0; i < length; i++) {
+            this.neurons[i].displayConnectionsMessages(ctx);
+        };
+
+        for (var i = 0; i < length; i++) {
+            this.neurons[i].display(ctx);
+        };
 
         ctx.restore();
     }

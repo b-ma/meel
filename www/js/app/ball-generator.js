@@ -3,72 +3,12 @@ var events = require('events')
   , _ = require('underscore')
   , Vector = require('vector')
   , helpers = require('../lib/canvas-helpers')
+  , Ball = require('./ball')
 ;
 
-var Ball = function(position, value) {
+function BallGenerator(position, frequency) {
     this.position = position;
-    this.strength = value;
-    this.gravity = new Vector(0, 0.1);
-
-    this.dead = false;
-    this.lifeTime = 1;
-    this.speed = new Vector(0, this.strength * 3 + 2);
-    this.lastSpeed = new Vector(0, 0);
-
-    events.EventEmitter.call(this);
-
-    this.emit('bounce', this.strength);
-}
-
-util.inherits(Ball, events.EventEmitter);
-
-_.extend(Ball.prototype, {
-    isDead: function() {
-        return this.dead;
-    },
-
-    update: function() {
-        if (this.position.y >= 0) {
-            this.speed.multiply(-0.8);
-            this.emit('bounce', this.strength * this.lifeTime);
-        }
-
-        this.speed.add(this.gravity);
-        this.position.add(this.speed);
-
-        if (this.position.y > 0) {
-            this.position.y = 0;
-        }
-
-        // if (this.lastSpeed && Math.abs(this.lastSpeed.y - this.speed.y) < 0.05) {
-        //     this.dead = true;
-        // }
-        this.lifeTime -= 0.005;
-        if (this.lifeTime < 0) {
-            this.dead = true;
-        }
-
-        this.lastSpeed = this.speed.clone();
-    },
-
-    display: function(ctx) {
-        if (this.isDead()) { return; }
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.globalAlpha = this.lifeTime; // this.strength - 1;
-        ctx.strokeStyle = '#454545';
-        ctx.translate(this.position.x, this.position.y - 5);
-        ctx.arc(0, 0, 3, 0, Math.PI * 2, false);
-        ctx.stroke();
-        ctx.closePath();
-        ctx.restore();
-    }
-});
-
-function BallGenerator(position, note) {
-    this.position = position;
-    this.note = note;
+    this.frequency = frequency;
     this.balls = [];
 
     events.EventEmitter.call(this);
@@ -79,10 +19,12 @@ util.inherits(BallGenerator, events.EventEmitter);
 _.extend(BallGenerator.prototype, {
     feedForward: function(value) {
         var ball = new Ball(new Vector(0, 0), value);
-        ball.on('bounce', function(strength) {
-            // console.log(strength);
-        });
+        ball.on('bounce', this.emitBounce.bind(this));
         this.balls.push(ball);
+    },
+
+    emitBounce: function(strength, decay) {
+        this.emit('bounce', this.frequency + decay * 4, strength);
     },
 
     update: function() {

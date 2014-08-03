@@ -50,7 +50,7 @@ util.inherits(Connection, events.EventEmitter);
 _.extend(Connection.prototype, {
     feedForward: function(input) {
         var messageValue = input * this.weight;
-        var messageColor = 255 - Math.round(helpers.constrain(input, 0, 1) * 255);
+        var messageColor = 255 - Math.round(helpers.constrain(messageValue, 0, 1) * 255);
         var message = {
             value: messageValue,
             position: this.source.position.clone(),
@@ -102,37 +102,29 @@ _.extend(Connection.prototype, {
 
         // update color
         if (this.isResting) {
-            this.color.r += 1;
-            this.color.g += 1;
-            this.color.b += 1;
-
+            this.color.r += 2;
+            this.color.g += 2;
+            this.color.b += 2;
             var limit = 255;
+
             if (this.color.r > limit || this.color.g > limit || this.color.b > limit) {
                 this.isResting = false;
                 this.color.r = 255;
                 this.color.g = 255;
                 this.color.b = 255;
             }
+        } else {
+            this.color.r += 0.002;
+            this.color.g += 0.002;
+            this.color.b += 0.002;
         }
     },
 
     displayPath: function(ctx) {
         ctx.save();
         ctx.beginPath();
-
-        if (!this.grad) {
-            this.grad = ctx.createRadialGradient(
-                Math.round(this.source.position.x), Math.round(this.source.position.y), 0,
-                Math.round(this.source.position.x), Math.round(this.source.position.y), this.h
-            );
-            this.grad.addColorStop(0, '#565656');
-            this.grad.addColorStop(0.4, '#232323');
-            this.grad.addColorStop(1, '#565656');
-        }
-
-        // ctx.strokeStyle = this.grad;
         ctx.strokeStyle = 'rgb(' + Math.round(this.color.r) + ', ' + Math.round(this.color.g) + ',' + Math.round(this.color.b) + ')';
-        // console.log(Math.round(this.color.r));
+
         ctx.moveTo(this.source.position.x, this.source.position.y);
         ctx.bezierCurveTo(
             this.controlPoint1.x, this.controlPoint1.y,

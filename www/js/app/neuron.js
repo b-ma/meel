@@ -68,13 +68,15 @@ _.extend(Neuron.prototype, {
         this.sum += value;
         if (this.sum < 1) { return; }
 
-        this.connections.forEach(function(connection) {
-            connection.feedForward(this.sum);
-        }, this);
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].feedForward(this.sum);
+        }
 
-        this.outputs.forEach(function(output) {
-            output.feedForward(this.sum);
-        }, this);
+        var outputsLength = this.outputs.length;
+        for (var i = 0; i < outputsLength; i++) {
+            this.outputs[i].feedForward(this.sum);
+        }
 
         this.sum = 0;
     },
@@ -98,15 +100,17 @@ _.extend(Neuron.prototype, {
     },
 
     displayConnectionsPaths: function(ctx) {
-        this.connections.forEach(function(connection) {
-            connection.displayPath(ctx);
-        });
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].displayPath(ctx);
+        }
     },
 
     displayConnectionsMessages: function(ctx) {
-        this.connections.forEach(function(connection) {
-            connection.displayMessages(ctx);
-        });
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].displayMessages(ctx);
+        }
     }
 });
 
