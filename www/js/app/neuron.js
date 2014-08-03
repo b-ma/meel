@@ -86,13 +86,13 @@ _.extend(Neuron.prototype, {
             // this.gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 4);
             // this.gradient.addColorStop(0, 'gray');
             // this.gradient.addColorStop(1, '#ffffff');
-            this.gradient = '#ffffff';
+            this.gradient = '#000000';
         }
 
         ctx.save();
         ctx.beginPath();
         ctx.fillStyle = this.gradient;
-        ctx.globalAlpha = this.sum / 2 + 0.5;
+        ctx.globalAlpha = this.sum / 2 + 0.2;
         ctx.translate(this.position.x, this.position.y);
         // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
         ctx.rect(-4, -1.5, 8, 3);

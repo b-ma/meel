@@ -35,7 +35,7 @@ var distance = networkWidth / (neuronCount - 1);
 
 // layer 1
 for (var i = 0; i < neuronCount; i++) {
-    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), 0), 'layer-1');
+    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), h / 6), 'layer-1');
     network.addNeuron(neuron);
     network.connect(inputNeuron, neuron);
     firstLayer.push(neuron);
@@ -43,7 +43,7 @@ for (var i = 0; i < neuronCount; i++) {
 
 // layer 2
 for (var i = 0; i < neuronCount; i++) {
-    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -160), 'layer-2');
+    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), 0), 'layer-2');
     network.addNeuron(neuron);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;
     var index = neuronCount - (i + 1);
@@ -56,7 +56,7 @@ neuronCount = Math.ceil(neuronCount / 2);
 distance = networkWidth / (neuronCount - 1);
 
 for (var i = 0; i < neuronCount; i++) {
-    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -300), 'layer-3');
+    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), 'layer-3');
     network.addNeuron(neuron);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;
     var index = neuronCount - (i + 1);

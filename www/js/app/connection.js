@@ -82,12 +82,16 @@ _.extend(Connection.prototype, {
         ctx.beginPath();
 
         if (!this.grad) {
-            this.grad = ctx.createRadialGradient(0, 0, 0, 0, 0, this.h);
-            this.grad.addColorStop(0, '#ffffff');
-            this.grad.addColorStop(1, '#505090');
+            this.grad = ctx.createRadialGradient(
+                Math.round(this.source.position.x), Math.round(this.source.position.y), 0,
+                Math.round(this.source.position.x), Math.round(this.source.position.y), this.h
+            );
+            this.grad.addColorStop(0, '#686868');
+            this.grad.addColorStop(0.2, '#232323');
+            this.grad.addColorStop(1, '#686868');
         }
 
-        ctx.strokeStyle = this.type === 'input' ? '#ffffff' : this.grad;
+        ctx.strokeStyle = this.grad;
 
         ctx.moveTo(this.source.position.x, this.source.position.y);
         ctx.bezierCurveTo(
@@ -103,7 +107,7 @@ _.extend(Connection.prototype, {
         this.messages.forEach(function(message) {
             ctx.beginPath();
 
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#232323';
             ctx.globalAlpha = message.value;
 
             ctx.arc(message.position.x, message.position.y, 2, 0, Math.PI * 2, false);
