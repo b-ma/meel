@@ -3,6 +3,7 @@ var Network = require('./app/network')
   , Connection = require('./app/connection')
   , Vector = require('vector')
   , UIModel = require('./app/models/ui-model')
+  , BallGenerator = require('./app/ball-generator')
   , helpers = require('./lib/canvas-helpers')
 ;
 
@@ -18,7 +19,7 @@ var ctx = canvas.getContext('2d');
 ctx.canvas.width  = w;
 ctx.canvas.height = window.innerHeight;
 
-var network = new Network(new Vector(w / 2, h / 2), networkWidth, networkHeight);
+var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
 
 // create input neuron
 var inputPosition = new Vector(0, networkHeight / 2);
@@ -29,6 +30,7 @@ network.setInput(inputNeuron);
 var firstLayer = [];
 var secondLayer = [];
 var thirdLayer = [];
+var generators = [];
 var neuronCount = 71;
 
 var distance = networkWidth / (neuronCount - 1);
@@ -62,7 +64,15 @@ for (var i = 0; i < neuronCount; i++) {
     var index = neuronCount - (i + 1);
     network.connect(secondLayer[index], neuron);
     network.connect(secondLayer[index + neuronCount - 1], neuron);
-    secondLayer.push(neuron);
+    thirdLayer.push(neuron);
+}
+// ball generator
+for (var i = 0; i < neuronCount; i++) {
+    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6));
+    // network.addNeuron(generator);
+    // var index = (i === 0) ? neuronCount - 1 : i - 1;
+    network.setOutput(thirdLayer[i], generator);
+    generators.push(generator);
 }
 
 // move inputPosition
@@ -83,8 +93,18 @@ var emitterCounter = 0;
 
     ctx.clearRect(0, 0, w, h);
 
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+
     network.update();
     network.display(ctx);
+
+    generators.forEach(function(generator) {
+        generator.update();
+        generator.display(ctx);
+    });
+
+    ctx.restore();
 
     window.requestAnimationFrame(update);
 }());

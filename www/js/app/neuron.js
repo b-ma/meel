@@ -41,6 +41,7 @@ function Neuron(position, type) {
     this.position = position;
     this.type = type;
     this.connections = [];
+    this.outputs = [];
     this.sum = 0;
 
     if (interfaces[type]) {
@@ -58,12 +59,20 @@ _.extend(Neuron.prototype, {
         this.connections.push(connection);
     },
 
+    setOutput: function(output) {
+        this.outputs.push(output);
+    },
+
     feedForward: function(value) {
         this.sum += value;
         if (this.sum < 1) { return; }
 
         this.connections.forEach(function(connection) {
             connection.feedForward(this.sum);
+        }, this);
+
+        this.outputs.forEach(function(output) {
+            output.feedForward(this.sum);
         }, this);
 
         this.sum = 0;
@@ -92,7 +101,9 @@ _.extend(Neuron.prototype, {
         ctx.save();
         ctx.beginPath();
         ctx.fillStyle = this.gradient;
-        ctx.globalAlpha = this.sum / 2 + 0.2;
+        if (this.type !== 'input') {
+            ctx.globalAlpha = this.sum / 2 + 0.2;
+        }
         ctx.translate(this.position.x, this.position.y);
         // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
         ctx.rect(-4, -1.5, 8, 3);

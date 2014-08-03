@@ -65,7 +65,7 @@ _.extend(Connection.prototype, {
                 this.controlPoint1,
                 this.controlPoint2,
                 this.dest.position,
-                Math.sqrt(message.timer)
+                message.timer // Math.sqrt(message.timer)
             )
         }, this);
 
@@ -86,9 +86,9 @@ _.extend(Connection.prototype, {
                 Math.round(this.source.position.x), Math.round(this.source.position.y), 0,
                 Math.round(this.source.position.x), Math.round(this.source.position.y), this.h
             );
-            this.grad.addColorStop(0, '#686868');
+            this.grad.addColorStop(0, '#565656');
             this.grad.addColorStop(0.2, '#232323');
-            this.grad.addColorStop(1, '#686868');
+            this.grad.addColorStop(1, '#565656');
         }
 
         ctx.strokeStyle = this.grad;

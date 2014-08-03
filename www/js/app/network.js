@@ -47,6 +47,10 @@ _.extend(Network.prototype, {
         neuron1.addConnection(connection);
     },
 
+    setOutput: function(neuron, output) {
+        neuron.setOutput(output);
+    },
+
     feedForward: function() {
         var message = Math.random();
         this.input.feedForward(message);
