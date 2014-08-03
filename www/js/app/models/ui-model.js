@@ -34,6 +34,8 @@ var controllers = {};
 ['inputPosition', 'controlPoint1Ratio', 'controlPoint2Ratio'].forEach(function(setting) {
     controllers[setting] = f1.add(uiModel, setting, 0, 1);
     controllers[setting].onChange(function(value) { uiModel.set(setting, value) })
-})
+});
+
+gui.close();
 
 module.exports = uiModel;

@@ -2,5 +2,7 @@ MEEL
 ========================================
 
 problems
-    problem with garbage collector/messages
-    => probably due to the fact they are not dying yet
+    too low framerate
+    => create cached canvas for connections drawing - update only if control ratio changes
+
+

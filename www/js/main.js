@@ -19,6 +19,21 @@ var ctx = canvas.getContext('2d');
 ctx.canvas.width  = w;
 ctx.canvas.height = window.innerHeight;
 
+// audio
+var frequencies = {
+    'a': '440',
+    'b': '440',
+    'c': '440',
+    'd': '440',
+    'e': '440',
+    'f': '440',
+    'g': '440'
+};
+var notes = Object.keys(frequencies);
+var notesCount = notes.length;
+var noteIndex = 0;
+
+// scene
 var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
 
 // create input neuron
@@ -31,7 +46,7 @@ var firstLayer = [];
 var secondLayer = [];
 var thirdLayer = [];
 var generators = [];
-var neuronCount = 71;
+var neuronCount = 70;
 
 var distance = networkWidth / (neuronCount - 1);
 
@@ -54,21 +69,27 @@ for (var i = 0; i < neuronCount; i++) {
 }
 
 // layer 3
-neuronCount = Math.ceil(neuronCount / 2);
-distance = networkWidth / (neuronCount - 1);
+// neuronCount = Math.ceil(neuronCount / 2);
+// distance = networkWidth / (neuronCount - 1);
+var breakpoint = Math.floor(neuronCount / 2);
 
 for (var i = 0; i < neuronCount; i++) {
     var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), 'layer-3');
     network.addNeuron(neuron);
-    // var index = (i === 0) ? neuronCount - 1 : i - 1;
-    var index = neuronCount - (i + 1);
+
+    var index = i < breakpoint ? breakpoint - (i + 1) : neuronCount - (i + 1 - breakpoint);
     network.connect(secondLayer[index], neuron);
-    network.connect(secondLayer[index + neuronCount - 1], neuron);
+
     thirdLayer.push(neuron);
 }
 // ball generator
 for (var i = 0; i < neuronCount; i++) {
-    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6));
+    var note = {
+        octave: Math.floor(noteIndex / notesCount),
+        note: notes[noteIndex % notesCount]
+    }
+
+    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), note);
     // network.addNeuron(generator);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;
     network.setOutput(thirdLayer[i], generator);
@@ -80,7 +101,7 @@ UIModel.on('change:inputPosition', function(ratio) {
     inputPosition.x = (networkWidth * ratio) - (networkWidth / 2);
 });
 
-var emitterInterval = 1;
+var emitterInterval = 2;
 var emitterCounter = 0;
 
 (function update() {

@@ -43,6 +43,7 @@ function Neuron(position, type) {
     this.connections = [];
     this.outputs = [];
     this.sum = 0;
+    this.color = (this.type !== 'input') ? '#000000' : '#ffffff';
 
     if (interfaces[type]) {
         var mixin = interfaces[type];
@@ -85,31 +86,27 @@ _.extend(Neuron.prototype, {
     },
 
     display: function(ctx) {
-        // console.log('display neuron');
-        // draw connections
-        this.connections.forEach(function(connection) {
-            connection.display(ctx);
-        });
-
-        if (!this.gradient) {
-            // this.gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 4);
-            // this.gradient.addColorStop(0, 'gray');
-            // this.gradient.addColorStop(1, '#ffffff');
-            this.gradient = '#000000';
-        }
-
         ctx.save();
         ctx.beginPath();
-        ctx.fillStyle = this.gradient;
-        if (this.type !== 'input') {
-            ctx.globalAlpha = this.sum / 2 + 0.2;
-        }
+        ctx.globalAlpha = this.sum;
+        ctx.fillStyle = this.color;
         ctx.translate(this.position.x, this.position.y);
-        // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
-        ctx.rect(-4, -1.5, 8, 3);
+        ctx.rect(-3, -1.5, 6, 3);
         ctx.fill();
         ctx.closePath();
         ctx.restore();
+    },
+
+    displayConnectionsPaths: function(ctx) {
+        this.connections.forEach(function(connection) {
+            connection.displayPath(ctx);
+        });
+    },
+
+    displayConnectionsMessages: function(ctx) {
+        this.connections.forEach(function(connection) {
+            connection.displayMessages(ctx);
+        });
     }
 });
 

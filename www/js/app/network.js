@@ -73,6 +73,14 @@ _.extend(Network.prototype, {
             ctx.closePath();
         // */
         this.neurons.forEach(function(neuron) {
+            neuron.displayConnectionsPaths(ctx);
+        });
+
+        this.neurons.forEach(function(neuron) {
+            neuron.displayConnectionsMessages(ctx);
+        });
+
+        this.neurons.forEach(function(neuron) {
             neuron.display(ctx);
         });
 

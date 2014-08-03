@@ -14,7 +14,13 @@ var Ball = function(position, value) {
     this.lifeTime = 1;
     this.speed = new Vector(0, this.strength * 3 + 2);
     this.lastSpeed = new Vector(0, 0);
+
+    events.EventEmitter.call(this);
+
+    this.emit('bounce', this.strength);
 }
+
+util.inherits(Ball, events.EventEmitter);
 
 _.extend(Ball.prototype, {
     isDead: function() {
@@ -24,6 +30,7 @@ _.extend(Ball.prototype, {
     update: function() {
         if (this.position.y >= 0) {
             this.speed.multiply(-0.8);
+            this.emit('bounce', this.strength * this.lifeTime);
         }
 
         this.speed.add(this.gravity);
@@ -59,8 +66,9 @@ _.extend(Ball.prototype, {
     }
 });
 
-function BallGenerator(position) {
+function BallGenerator(position, note) {
     this.position = position;
+    this.note = note;
     this.balls = [];
 
     events.EventEmitter.call(this);
@@ -71,6 +79,9 @@ util.inherits(BallGenerator, events.EventEmitter);
 _.extend(BallGenerator.prototype, {
     feedForward: function(value) {
         var ball = new Ball(new Vector(0, 0), value);
+        ball.on('bounce', function(strength) {
+            // console.log(strength);
+        });
         this.balls.push(ball);
     },
 
@@ -83,7 +94,8 @@ _.extend(BallGenerator.prototype, {
         });
 
         deadBalls.forEach(function(index) {
-            this.balls.splice(index, 1);
+            var ball = this.balls.splice(index, 1)[0];
+            ball.removeAllListeners('bounce')
         }, this);
     },
 

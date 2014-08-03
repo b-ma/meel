@@ -32,17 +32,41 @@ function Connection(source, dest) {
 
     this.messageTimeStep = Math.random() * 0.008 + 0.004 ;
     this.h = this.source.position.y - this.dest.position.y;
+
+    this.color = {
+        r: 255,
+        g: 255,
+        b: 255,
+        rMultiplier: (8 + Math.random() * 2),
+        gMultiplier: (8 + Math.random() * 2),
+        bMultiplier: (8 + Math.random() * 2),
+    };
+    this.colorLimit = 190;
+    this.isResting = false;
 }
 
 util.inherits(Connection, events.EventEmitter);
 
 _.extend(Connection.prototype, {
     feedForward: function(input) {
+        var messageValue = input * this.weight;
+        var messageColor = 255 - Math.round(helpers.constrain(input, 0, 1) * 255);
         var message = {
-            value: input * this.weight,
+            value: messageValue,
             position: this.source.position.clone(),
-            timer: 0
+            timer: 0,
+            color: 'rgb(' + messageColor + ', ' + messageColor + ', ' + messageColor + ')',
         };
+
+        if (!this.isResting) {
+            this.color.r -= message.value * this.color.rMultiplier;
+            this.color.g -= message.value * this.color.gMultiplier;
+            this.color.b -= message.value * this.color.bMultiplier;
+
+            if (this.color.r < this.colorLimit || this.color.g < this.colorLimit || this.color.b < this.colorLimit) {
+                this.isResting = true;
+            }
+        }
 
         this.messages.push(message);
     },
@@ -75,9 +99,24 @@ _.extend(Connection.prototype, {
 
             this.dest.feedForward(message.value);
         }, this);
+
+        // update color
+        if (this.isResting) {
+            this.color.r += 1;
+            this.color.g += 1;
+            this.color.b += 1;
+
+            var limit = 255;
+            if (this.color.r > limit || this.color.g > limit || this.color.b > limit) {
+                this.isResting = false;
+                this.color.r = 255;
+                this.color.g = 255;
+                this.color.b = 255;
+            }
+        }
     },
 
-    display: function(ctx) {
+    displayPath: function(ctx) {
         ctx.save();
         ctx.beginPath();
 
@@ -87,12 +126,13 @@ _.extend(Connection.prototype, {
                 Math.round(this.source.position.x), Math.round(this.source.position.y), this.h
             );
             this.grad.addColorStop(0, '#565656');
-            this.grad.addColorStop(0.2, '#232323');
+            this.grad.addColorStop(0.4, '#232323');
             this.grad.addColorStop(1, '#565656');
         }
 
-        ctx.strokeStyle = this.grad;
-
+        // ctx.strokeStyle = this.grad;
+        ctx.strokeStyle = 'rgb(' + Math.round(this.color.r) + ', ' + Math.round(this.color.g) + ',' + Math.round(this.color.b) + ')';
+        // console.log(Math.round(this.color.r));
         ctx.moveTo(this.source.position.x, this.source.position.y);
         ctx.bezierCurveTo(
             this.controlPoint1.x, this.controlPoint1.y,
@@ -103,38 +143,18 @@ _.extend(Connection.prototype, {
         ctx.stroke();
         ctx.closePath();
 
+        ctx.restore();
+    },
+
+    displayMessages: function(ctx) {
         ctx.save();
         this.messages.forEach(function(message) {
             ctx.beginPath();
-
-            ctx.fillStyle = '#232323';
-            ctx.globalAlpha = message.value;
-
+            ctx.fillStyle = message.color;
             ctx.arc(message.position.x, message.position.y, 2, 0, Math.PI * 2, false);
             ctx.fill();
             ctx.closePath();
         });
-        ctx.restore();
-
-        /*
-        if (this.source.type === 'input') {
-            // draw control points
-            ctx.beginPath();
-            ctx.strokeStyle = 'green';
-            ctx.moveTo(this.source.position.x, this.source.position.y);
-            ctx.lineTo(this.controlPoint1.x, this.controlPoint1.y);
-            ctx.stroke();
-            ctx.closePath();
-
-            ctx.beginPath();
-            ctx.strokeStyle = 'red';
-            ctx.moveTo(this.dest.position.x, this.dest.position.y);
-            ctx.lineTo(this.controlPoint2.x, this.controlPoint2.y);
-            ctx.stroke();
-            ctx.closePath();
-        }
-        // */
-
         ctx.restore();
     }
 });
