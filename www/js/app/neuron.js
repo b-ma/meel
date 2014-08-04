@@ -27,12 +27,10 @@ var interfaces = {
         feedForward: function(value) {
             this.sum += value;
 
-            var connections = this.connections.slice(0);
-            connections.sort(function() { return Math.random() - 0.5; });
-            connection = connections[0]
+            var randomIndex = Math.floor(Math.random() * this.connections.length);
 
-            if (this.sum < 1) { return; }
-            connection.feedForward(this.sum);
+            // if (this.sum < 1) { return; }
+            this.connections[randomIndex].feedForward(this.sum);
             this.sum = 0;
         }
     }
@@ -41,8 +39,11 @@ var interfaces = {
 
 function Neuron(position, type) {
     this.position = position;
+    this.type = type;
     this.connections = [];
+    this.outputs = [];
     this.sum = 0;
+    this.color = (this.type !== 'input') ? '#000000' : '#ffffff';
 
     if (interfaces[type]) {
         var mixin = interfaces[type];
@@ -59,14 +60,25 @@ _.extend(Neuron.prototype, {
         this.connections.push(connection);
     },
 
+    setOutput: function(output) {
+        this.outputs.push(output);
+    },
+
     feedForward: function(value) {
         this.sum += value;
+        if (this.sum < 1) { return; }
 
-        this.connections.forEach(function(connection) {
-            if (this.sum < 1) { return; }
-            connection.feedForward(this.sum);
-            this.sum = 0;
-        }, this);
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].feedForward(this.sum);
+        }
+
+        var outputsLength = this.outputs.length;
+        for (var i = 0; i < outputsLength; i++) {
+            this.outputs[i].feedForward(this.sum);
+        }
+
+        this.sum = 0;
     },
 
     update: function() {
@@ -76,28 +88,29 @@ _.extend(Neuron.prototype, {
     },
 
     display: function(ctx) {
-        // console.log('display neuron');
-        // draw connections
-        this.connections.forEach(function(connection) {
-            connection.display(ctx);
-        });
-
-        if (!this.gradient) {
-            // this.gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 4);
-            // this.gradient.addColorStop(0, 'gray');
-            // this.gradient.addColorStop(1, '#ffffff');
-            this.gradient = '#ffffff';
-        }
-
         ctx.save();
         ctx.beginPath();
-        ctx.fillStyle = this.gradient;
+        ctx.globalAlpha = this.sum;
+        ctx.fillStyle = this.color;
         ctx.translate(this.position.x, this.position.y);
-        // ctx.arc(0, 0, 4, 0, Math.PI * 2, true);
-        ctx.rect(-4, -1.5, 8, 3);
+        ctx.rect(-3, -1.5, 6, 3);
         ctx.fill();
         ctx.closePath();
         ctx.restore();
+    },
+
+    displayConnectionsPaths: function(ctx) {
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].displayPath(ctx);
+        }
+    },
+
+    displayConnectionsMessages: function(ctx) {
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].displayMessages(ctx);
+        }
     }
 });
 
