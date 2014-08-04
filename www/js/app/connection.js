@@ -68,7 +68,7 @@ _.extend(Connection.prototype, {
     display: function(ctx) {
         ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#aaaaaa';
         ctx.fillStyle = '#ffffff';
 
         ctx.moveTo(this.source.position.x, this.source.position.y);
