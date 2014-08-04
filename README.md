@@ -2,7 +2,9 @@ MEEL
 ========================================
 
 @TODO
-move Ball from BallGenerator
+move audio to its own module
+refactor ballGenrator instanciation
+fix clipping
 
 
 
