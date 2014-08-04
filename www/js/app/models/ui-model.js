@@ -1,13 +1,52 @@
 var events = require('events')
   , util = require('util')
-  , dat = require('dat-gui');
+  , dat = require('dat-gui')
+  , _ = require('underscore')
+;
+
+var settings = {
+    inputPosition: {
+        default: 0.5,
+        range: [0, 1]
+    },
+    controlPoint1Ratio: {
+        default: 0.5,
+        range: [0, 1]
+    },
+    controlPoint2Ratio: {
+        default: 0.5,
+        range: [0, 1]
+    },
+    volume: {
+        default: 0.5,
+        range: [0, 1]
+    },
+    compressorAttack: {
+        default: 0.003,
+        range: [0, 1]
+    },
+    compressorKnee: {
+        default: 30,
+        range: [0, 40]
+    },
+    compressorRatio: {
+        default: 12,
+        range: [0, 20]
+    },
+    compressorRelease: {
+        default: 0.25,
+        range: [0, 1]
+    },
+    compressorThreshold: {
+        default: -24,
+        range: [-100, 0]
+    }
+}
 
 var UIModel = function() {
-    this.inputPosition = 0.5;
-    // presets [0.57, 0.07] - [1, 0.7] - [0.8, 0.2]
-    this.controlPoint1Ratio = 0.5;
-    this.controlPoint2Ratio = 0.5;
-    this.volume = 0.5;
+    _.each(settings, function(setting, attr) {
+        this[attr] = setting.default;
+    }, this);
 
     events.EventEmitter.call(this);
 };
@@ -32,9 +71,9 @@ var gui = f1 = new dat.GUI();
 var controllers = {};
 // display settings
 // var f1 = gui.addFolder('display settings');
-['inputPosition', 'controlPoint1Ratio', 'controlPoint2Ratio', 'volume'].forEach(function(setting) {
-    controllers[setting] = f1.add(uiModel, setting, 0, 1);
-    controllers[setting].onChange(function(value) { uiModel.set(setting, value) })
+_.each(settings, function(setting, attr) {
+    controllers[attr] = f1.add(uiModel, attr, setting.range[0], setting.range[1]);
+    controllers[attr].onChange(function(value) { uiModel.set(attr, value); })
 });
 
 gui.close();

@@ -34,50 +34,56 @@ var notesCount = notes.length;
 var noteIndex = 0;
 var audio = new AudioContext();
 var master = audio.createGain();
-master.gain.value = UIModel.get('volume');
-
+var volume = audio.createGain();
 var compressor = audio.createDynamicsCompressor();
+var lowFilter = audio.createBiquadFilter();
 
-UIModel.on('change:volume', function(volume) {
-    master.gain.value = volume;
-})
+lowFilter.frequency.value = 22000.0;
+lowFilter.Q.value = 5.0;
 
-/*
-var processAudio = function(e) {
-    var input = e.inputBuffer.getChannelData(0);
-    var output = e.outputBuffer.getChannelData(0);
+volume.gain.value = UIModel.get('volume');
+UIModel.on('change:volume', function(value) { volume.gain.value = value; });
 
-    for (var i = 0; i < input.length; i++) {
-        var absValue = Math.abs(input[i]);
-        if (absValue > 1) {
-            output[i] = 1;
-        }
-    }
-}
+compressor.attack.value = UIModel.get('compressorAttack');
+compressor.knee.value = UIModel.get('compressorKnee');
+compressor.ratio.value = UIModel.get('compressorRatio');
+compressor.release.value = UIModel.get('compressorRelease');
+compressor.threshold.value = UIModel.get('compressorThreshold');
 
-var meter = audio.createScriptProcessor(1024, 1, 1);
-meter.onaudioprocess = processAudio;
+UIModel.on('change:compressorAttack', function(value) { console.log(value); compressor.attack.value = value; });
+UIModel.on('change:compressorKnee', function(value) { compressor.knee.value = value; });
+UIModel.on('change:compressorRatio', function(value) { compressor.ratio.value = value; });
+UIModel.on('change:compressorRelease', function(value) { compressor.release.value = value; });
+UIModel.on('change:compressorThreshold', function(value) { compressor.threshold.value = value; });
 
-master.connect(meter);
-meter.connect(audio.destination);
-// */
+// final audio chain
 master.connect(compressor);
-compressor.connect(audio.destination);
+lowFilter.connect(compressor);
+compressor.connect(volume);
+volume.connect(audio.destination);
 
-var playSound =  function(frequency, strength) {
+var playSound =  function(frequency, strength, position) {
+    if (frequency > 24000 || frequency < 100) { return; }
+
     var now = audio.currentTime;
     var oscillator = audio.createOscillator();
     var gainNode = audio.createGain();
+    var compressor = audio.createDynamicsCompressor();
+    var panner = audio.createPanner();
 
     oscillator.frequency.value = frequency;
-    oscillator.connect(gainNode);
-    gainNode.connect(master);
+    panner.setPosition(position.x, position.y, strength * -100);
 
-    // gainNode.gain.value = 0;
+    // ADSR
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(strength * 0.05, now  + 0.02);
-    gainNode.gain.setTargetAtTime(0.001, now + 0.5, 1);
+    gainNode.gain.linearRampToValueAtTime(strength * 0.5, now  + 0.02);
+    gainNode.gain.setTargetAtTime(0.1, now + 0.5, 1);
     gainNode.gain.setTargetAtTime(0, now + 8, 1);
+
+    oscillator.connect(compressor);
+    compressor.connect(panner);
+    panner.connect(gainNode);
+    gainNode.connect(master);
 
     oscillator.start(now);
     oscillator.stop(now + 12);
@@ -86,10 +92,10 @@ var playSound =  function(frequency, strength) {
     oscillator = null;
 }
 
-//  setTimeout(function() {
-//      playSound(400, 0.8);
-//  }, 1000);
-//  return
+// setTimeout(function() {
+//     playSound(55, 0.8);
+// }, 1000);
+// return;
 //
 //  var btn = document.querySelector('#test');
 //  btn.addEventListener('click', function() {
@@ -162,9 +168,10 @@ for (var i = 0; i < neuronCount; i++) {
     }
     noteIndex += 1;
 
-    var generator = new BallGenerator(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), frequencies[index]);
+    var location = new Vector(- (networkWidth / 2) + (distance * i), -h / 6);
+    var generator = new BallGenerator(location, frequencies[index]);
     generator.on('bounce', function(frequency, strength) {
-        playSound.apply(null, arguments);
+        playSound(frequency, strength, location);
     });
     // network.addNeuron(generator);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;

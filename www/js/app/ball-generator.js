@@ -23,8 +23,8 @@ _.extend(BallGenerator.prototype, {
         this.balls.push(ball);
     },
 
-    emitBounce: function(strength, decay) {
-        this.emit('bounce', this.frequency + decay * 4, strength);
+    emitBounce: function(strength, bounceCount) {
+        this.emit('bounce', this.frequency + bounceCount * (8 * Math.random() - 4), strength);
     },
 
     update: function() {
