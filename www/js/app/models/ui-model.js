@@ -18,7 +18,7 @@ var settings = {
         range: [0, 1]
     },
     volume: {
-        default: 0.5,
+        default: 0.7,
         range: [0, 1]
     },
     compressorAttack: {
@@ -26,11 +26,11 @@ var settings = {
         range: [0, 1]
     },
     compressorKnee: {
-        default: 30,
+        default: 15,
         range: [0, 40]
     },
     compressorRatio: {
-        default: 12,
+        default: 5,
         range: [0, 20]
     },
     compressorRelease: {
@@ -38,7 +38,7 @@ var settings = {
         range: [0, 1]
     },
     compressorThreshold: {
-        default: -24,
+        default: -38,
         range: [-100, 0]
     }
 }

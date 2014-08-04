@@ -64,7 +64,7 @@ volume.connect(audio.destination);
 
 var playSound =  function(frequency, strength, position) {
     if (frequency > 24000 || frequency < 100) { return; }
-
+    console.log(strength);
     var now = audio.currentTime;
     var oscillator = audio.createOscillator();
     var gainNode = audio.createGain();
@@ -76,12 +76,12 @@ var playSound =  function(frequency, strength, position) {
 
     // ADSR
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(strength * 0.5, now  + 0.02);
-    gainNode.gain.setTargetAtTime(0.1, now + 0.5, 1);
-    gainNode.gain.setTargetAtTime(0, now + 8, 1);
+    gainNode.gain.linearRampToValueAtTime(strength * 0.3, now  + 0.02);
+    gainNode.gain.setTargetAtTime(0.07, now + 0.5, 1);
+    gainNode.gain.setTargetAtTime(0, now + 6, 1);
 
-    oscillator.connect(compressor);
-    compressor.connect(panner);
+    oscillator.connect(panner);
+    // compressor.connect(panner);
     panner.connect(gainNode);
     gainNode.connect(master);
 
@@ -170,8 +170,8 @@ for (var i = 0; i < neuronCount; i++) {
 
     var location = new Vector(- (networkWidth / 2) + (distance * i), -h / 6);
     var generator = new BallGenerator(location, frequencies[index]);
-    generator.on('bounce', function(frequency, strength) {
-        playSound(frequency, strength, location);
+    generator.on('bounce', function(frequency, strength, position) {
+        playSound(frequency, strength, position);
     });
     // network.addNeuron(generator);
     // var index = (i === 0) ? neuronCount - 1 : i - 1;
