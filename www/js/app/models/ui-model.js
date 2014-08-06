@@ -21,25 +21,29 @@ var settings = {
         default: 0.7,
         range: [0, 1]
     },
-    compressorAttack: {
-        default: 0.003,
-        range: [0, 1]
-    },
-    compressorKnee: {
-        default: 15,
-        range: [0, 40]
-    },
-    compressorRatio: {
-        default: 5,
-        range: [0, 20]
-    },
-    compressorRelease: {
-        default: 0.25,
-        range: [0, 1]
-    },
-    compressorThreshold: {
-        default: -38,
-        range: [-100, 0]
+    // compressorAttack: {
+    //     default: 0.003,
+    //     range: [0, 1]
+    // },
+    // compressorKnee: {
+    //     default: 15,
+    //     range: [0, 40]
+    // },
+    // compressorRatio: {
+    //     default: 5,
+    //     range: [0, 20]
+    // },
+    // compressorRelease: {
+    //     default: 0.25,
+    //     range: [0, 1]
+    // },
+    // compressorThreshold: {
+    //     default: -38,
+    //     range: [-100, 0]
+    // },
+    spatialize: {
+        default: 1.3,
+        range: [0, 4]
     }
 }
 
