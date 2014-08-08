@@ -24,7 +24,7 @@ _.extend(BallGenerator.prototype, {
     },
 
     emitBounce: function(strength, bounceCount) {
-        var interval = this.frequency * (4 / 440);
+        var interval = this.frequency * (1 / 440);
         var frequency = this.frequency + bounceCount * (interval * 2 * Math.random() - interval);
         this.emit('bounce', frequency, strength, this.position);
     },

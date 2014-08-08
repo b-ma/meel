@@ -37,11 +37,13 @@ var playSound = function(frequency, strength, position) {
     var spatialize = UIModel.get('spatialize') + (Math.random() * 0.1);
     panner.setPosition(position.x * spatialize, position.y * spatialize, strength * -100 * spatialize);
 
+    // change adsr according to frequency
+    var ratio = frequency > 2000 ? 0.3 : frequency > 2000 ? 1 : 1.4;
     // ADSR
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(strength * 0.25, now + 0.03);
-    gainNode.gain.setTargetAtTime(0.05, now + 0.5, 0.5);
-    gainNode.gain.setTargetAtTime(0, now + 5, 1);
+    gainNode.gain.linearRampToValueAtTime(strength * 0.25 * ratio, now + 0.03);
+    gainNode.gain.setTargetAtTime(0.05 * ratio, now + 0.5, 0.5);
+    gainNode.gain.setTargetAtTime(0, now + 5, 0.5);
 
     oscillator.connect(panner);
     panner.connect(gainNode);
