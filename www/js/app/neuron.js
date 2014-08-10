@@ -93,7 +93,7 @@ _.extend(Neuron.prototype, {
         ctx.globalAlpha = this.sum;
         ctx.fillStyle = this.color;
         ctx.translate(this.position.x, this.position.y);
-        ctx.rect(this.width / 2, -1.5, this.width, 3);
+        ctx.rect(- this.width / 2, -1.5, this.width, 3);
         ctx.fill();
         ctx.closePath();
         ctx.restore();
