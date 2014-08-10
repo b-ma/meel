@@ -2,29 +2,30 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>meel</title>
+    <title>b-ma | meel</title>
     <style>
     @import url(http://fonts.googleapis.com/css?family=Abel);
 
     body {
         background-color: #ffffff;
-        padding: 0;
         font-size: 62.5%;
+        padding: 0;
+        margin: 0;
     }
 
-    canvas {
+    #scene {
         display: block;
         margin: 0 auto;
     }
 
     p {
-        font-family: Abel;
-        font-size: 1.4rem;
         position: absolute;
         top: 20px;
         left: 20px;
         margin: 0;
-        text-indent: 26px;
+        padding-left: 26px;
+        font-family: Abel;
+        font-size: 1.4rem;
         color: #787878;
         background: url(./img/speakers.svg) left 50% no-repeat;
         background-size: 18px 20px;
@@ -35,11 +36,30 @@
     p.hide {
         opacity: 0;
     }
+
+    #github {
+        position: absolute;
+        left: 20px;
+        bottom:  20px;
+        height: 20px;
+        font-family: Abel;
+        font-size: 0.8rem;
+        font-style: italic;
+        color: #989898;
+        text-decoration: none;
+    }
+
+    #github:focus,
+    #github:hover {
+        text-decoration: underline;
+    }
+
     </style>
 </head>
 <body>
     <canvas id="scene"></canvas>
     <p>turn on your speakers</p>
+    <a id="github" href="https://github.com/b-ma/meel" target="_blank">github</a>
     <script src="./js/build.js"></script>
 </body>
 </html>
