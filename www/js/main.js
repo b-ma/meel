@@ -8,9 +8,15 @@ var Network = require('./app/network')
   , soundManager = require('./app/sound-manager')
 ;
 
+// hide message after 6 seconds
+var $message = document.querySelector('p');
+setTimeout(function() {
+    $message.classList.add('hide');
+}, 6000);
+
 // prepare network
-var w = 600;
-var h = 700;
+var h = window.innerHeight
+var w = h * (6/7);
 var margin = 50;
 var networkWidth = w - (2 * margin);
 var networkHeight = h - (2 * margin);
@@ -24,6 +30,10 @@ ctx.canvas.height = window.innerHeight;
 // scene
 var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
 
+var neuronCount = 70;
+var neuronWidth = (networkWidth / neuronCount) - 1;
+Neuron.prototype.width = neuronWidth;
+
 // create input neuron
 var inputPosition = new Vector(0, networkHeight / 2);
 var inputNeuron = new Neuron(inputPosition, 'input');
@@ -34,13 +44,12 @@ var firstLayer = [];
 var secondLayer = [];
 var thirdLayer = [];
 var generators = [];
-var neuronCount = 70;
 
 var distance = networkWidth / (neuronCount - 1);
 
-// layer 1
+// layer 1 - emitter
 for (var i = 0; i < neuronCount; i++) {
-    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), h / 6), 'layer-1');
+    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), networkHeight / 6), 'layer-1');
     network.addNeuron(neuron);
     network.connect(inputNeuron, neuron);
     firstLayer.push(neuron);
@@ -60,7 +69,7 @@ for (var i = 0; i < neuronCount; i++) {
 var breakpoint = Math.floor(neuronCount / 2);
 
 for (var i = 0; i < neuronCount; i++) {
-    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -h / 6), 'layer-3');
+    var neuron = new Neuron(new Vector(- (networkWidth / 2) + (distance * i), -networkHeight / 6), 'layer-3');
     network.addNeuron(neuron);
 
     var index = i < breakpoint ? breakpoint - (i + 1) : neuronCount - (i + 1 - breakpoint);
@@ -89,11 +98,11 @@ for (var i = 0; i < neuronCount; i++) {
     }
     noteIndex += 1;
 
-    var location = new Vector(- (networkWidth / 2) + (distance * i), -h / 6);
+    var location = new Vector(- (networkWidth / 2) + (distance * i), -networkHeight / 6);
     var generator = new BallGenerator(location, frequencies[index]);
 
-    generator.on('bounce', function(frequency, strength, position) {
-        soundManager.play(frequency, strength, position);
+    generator.on('bounce', function() {
+        soundManager.play.apply(soundManager, arguments);
     });
 
     network.setOutput(thirdLayer[i], generator);

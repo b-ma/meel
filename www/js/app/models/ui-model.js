@@ -7,43 +7,62 @@ var events = require('events')
 var settings = {
     inputPosition: {
         default: 0.5,
-        range: [0, 1]
+        range: [0, 1],
+        folder: 'display'
     },
     controlPoint1Ratio: {
         default: 0.5,
-        range: [0, 1]
+        range: [0, 1],
+        folder: 'display'
     },
     controlPoint2Ratio: {
         default: 0.5,
-        range: [0, 1]
+        range: [0, 1],
+        folder: 'display'
     },
     volume: {
         default: 0.7,
-        range: [0, 1]
+        range: [0, 1],
+        folder: 'sound'
     },
-    // compressorAttack: {
-    //     default: 0.003,
-    //     range: [0, 1]
-    // },
-    // compressorKnee: {
-    //     default: 15,
-    //     range: [0, 40]
-    // },
-    // compressorRatio: {
-    //     default: 5,
-    //     range: [0, 20]
-    // },
-    // compressorRelease: {
-    //     default: 0.25,
-    //     range: [0, 1]
-    // },
-    // compressorThreshold: {
-    //     default: -38,
-    //     range: [-100, 0]
-    // },
+    phasing: {
+        default: 4,
+        range: [0, 10],
+        folder: 'sound'
+    },
     spatialize: {
-        default: 1.3,
-        range: [0, 4]
+        default: 0.8,
+        range: [0, 4],
+        folder: 'sound'
+    },
+    compressorAttack: {
+        default: 0.0001,
+        // default: 0.003,
+        range: [0, 1],
+        folder: 'sound'
+    },
+    compressorKnee: {
+        default: 8,
+        // default: 30,
+        range: [0, 40],
+        folder: 'sound'
+    },
+    compressorRatio: {
+        // default: 5,
+        default: 12,
+        range: [0, 20],
+        folder: 'sound'
+    },
+    compressorRelease: {
+        default: 0.25,
+        range: [0, 1],
+        folder: 'sound'
+    },
+    compressorThreshold: {
+        default: -50,
+        // default: -24,
+        range: [-100, 0],
+        folder: 'sound'
     }
 }
 
@@ -74,9 +93,12 @@ var uiModel = new UIModel();
 var gui = f1 = new dat.GUI();
 var controllers = {};
 // display settings
-// var f1 = gui.addFolder('display settings');
+var folders = {};
+folders['display'] = gui.addFolder('display settings');
+folders['sound'] = gui.addFolder('sound settings');
+
 _.each(settings, function(setting, attr) {
-    controllers[attr] = f1.add(uiModel, attr, setting.range[0], setting.range[1]);
+    controllers[attr] = folders[setting.folder].add(uiModel, attr, setting.range[0], setting.range[1]);
     controllers[attr].onChange(function(value) { uiModel.set(attr, value); })
 });
 
