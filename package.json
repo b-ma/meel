@@ -1,8 +1,8 @@
 {
-  "name": "meel-neural-music",
+  "name": "meel",
   "version": "0.0.0",
-  "description": "demo",
-  "main": "index.js",
+  "description": "neural network producing music",
+  "main": "www/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
