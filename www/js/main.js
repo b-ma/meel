@@ -116,7 +116,7 @@ UIModel.on('change:inputPosition', function(ratio) {
 });
 
 // main loop
-var inputInterval = 2;
+var inputInterval = 4;
 var inputCounter = 0;
 var generatorsLength = generators.length;
 
