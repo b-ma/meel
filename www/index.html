@@ -60,11 +60,14 @@
     <canvas id="scene"></canvas>
     <p>turn on your speakers</p>
     <a id="github" href="https://github.com/b-ma/meel" target="_blank">github</a>
-    <script src="./js/build.js"></script>
 
+    <script src="./js/env.js"></script>
     <script type="text/javascript">
+        var env = window.ENV || {};
+        document.write('<script src="./js/build.js?' + env.version +'"><\/script>')
+
         var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', '']);
+            _gaq.push(['_setAccount', env.analytics]);
             _gaq.push(['_trackPageview']);
 
         (function() {
