@@ -43,11 +43,20 @@ function Connection(source, dest) {
     };
     this.colorLimit = 190;
     this.isResting = false;
+
+    this.updateControlPoints();
 }
 
 util.inherits(Connection, events.EventEmitter);
 
 _.extend(Connection.prototype, {
+    updateControlPoints: function() {
+        var controlPoint1Y = this.source.position.y - (ui.get('controlPoint1Ratio') * 2 * this.h);
+        var controlPoint2Y = this.dest.position.y + (ui.get('controlPoint2Ratio') * 2 * this.h);
+        this.controlPoint1 = new Vector(this.source.position.x, controlPoint1Y);
+        this.controlPoint2 = new Vector(this.dest.position.x, controlPoint2Y);
+    },
+
     feedForward: function(input) {
         var messageValue = input * this.weight;
         var messageColor = 255 - Math.round(helpers.constrain(messageValue, 0, 1) * 255);
@@ -73,10 +82,7 @@ _.extend(Connection.prototype, {
 
     update: function() {
         // update control points
-        var controlPoint1Y = this.source.position.y - (ui.get('controlPoint1Ratio') * 2 * this.h);
-        var controlPoint2Y = this.dest.position.y + (ui.get('controlPoint2Ratio') * 2 * this.h);
-        this.controlPoint1 = new Vector(this.source.position.x, controlPoint1Y);
-        this.controlPoint2 = new Vector(this.dest.position.x, controlPoint2Y);
+        this.updateControlPoints();
 
         var deadMessages = [];
         this.messages.forEach(function(message) {

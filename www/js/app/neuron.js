@@ -82,9 +82,10 @@ _.extend(Neuron.prototype, {
     },
 
     update: function() {
-        this.connections.forEach(function(connection) {
-            connection.update();
-        });
+        var connectionsLength = this.connections.length;
+        for (var i = 0; i < connectionsLength; i++) {
+            this.connections[i].update();
+        }
     },
 
     display: function(ctx) {

@@ -29,7 +29,7 @@ ctx.canvas.width  = w;
 ctx.canvas.height = window.innerHeight;
 
 // scene
-var network = new Network(new Vector(w / 2, h / 2), networkWidth, networkHeight);
+var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
 
 var neuronCount = 70;
 var neuronWidth = (networkWidth / neuronCount) - 1;
@@ -133,6 +133,7 @@ var update = function() {
 var render = function(ctx) {
     ctx.clearRect(0, 0, w, h);
     ctx.save();
+    ctx.translate(w / 2, h / 2);
 
     network.display(ctx);
     for (var i = 0; i < generatorsLength; i++) {

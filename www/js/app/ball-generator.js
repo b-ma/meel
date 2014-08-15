@@ -45,16 +45,17 @@ _.extend(BallGenerator.prototype, {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
 
-        this.balls.forEach(function(ball) {
-            ball.display(ctx);
-        });
+        var ballsLength = this.balls.length;
+        for (var i = 0; i < ballsLength; i++) {
+            this.balls[i].display(ctx);
+        }
         /*
         ctx.beginPath();
         ctx.fillStyle = 'green';
         ctx.arc(0, 0, 8, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.closePath();
-        */
+        // */
         ctx.restore();
     }
 });
