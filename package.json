@@ -16,6 +16,7 @@
   "dependencies": {
     "underscore": "~1.6.0",
     "vector": "git+https://github.com/b-ma/vector2d.git",
+    "stats": "git+https://github.com/mrdoob/stats.js.git",
     "dat-gui": "~0.5.0"
   }
 }

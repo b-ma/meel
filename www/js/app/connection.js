@@ -134,7 +134,6 @@ _.extend(Connection.prototype, {
 
         ctx.stroke();
         ctx.closePath();
-
         ctx.restore();
     },
 

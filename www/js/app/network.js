@@ -66,13 +66,7 @@ _.extend(Network.prototype, {
     display: function(ctx) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
-        /* // draw bounding scene rect
-            ctx.beginPath();
-            ctx.strokeStyle = 'green';
-            ctx.rect(-this.w / 2, -this.h / 2, this.w, this.h);
-            ctx.stroke();
-            ctx.closePath();
-        // */
+
         var length = this.neurons.length;
 
         for (var i = 0; i < length; i++) {

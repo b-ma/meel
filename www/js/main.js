@@ -6,6 +6,7 @@ var Network = require('./app/network')
   , BallGenerator = require('./app/ball-generator')
   , helpers = require('./lib/canvas-helpers')
   , soundManager = require('./app/sound-manager')
+  , Stats = require('./lib/stats');
 ;
 
 // hide message after 6 seconds
@@ -28,7 +29,7 @@ ctx.canvas.width  = w;
 ctx.canvas.height = window.innerHeight;
 
 // scene
-var network = new Network(new Vector(0, 0), networkWidth, networkHeight);
+var network = new Network(new Vector(w / 2, h / 2), networkWidth, networkHeight);
 
 var neuronCount = 70;
 var neuronWidth = (networkWidth / neuronCount) - 1;
@@ -78,7 +79,7 @@ for (var i = 0; i < neuronCount; i++) {
     thirdLayer.push(neuron);
 }
 
-// ball generator
+// ball/sound generators
 var lastOctave;
 var frequencies = soundManager.frequencies;
 var notes = Object.keys(frequencies);
@@ -115,31 +116,74 @@ UIModel.on('change:inputPosition', function(ratio) {
 });
 
 // main loop
-var emitterInterval = 2;
-var emitterCounter = 0;
+var inputInterval = 2;
+var inputCounter = 0;
+var generatorsLength = generators.length;
 
-(function update() {
-    helpers.colorPicker.update(ctx);
-    emitterCounter = (emitterCounter + 1) % emitterInterval;
-    if (emitterCounter === 0) {
-        network.feedForward(Math.random());
-    }
-
-    ctx.clearRect(0, 0, w, h);
-
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
+var update = function() {
+    inputCounter = (inputCounter + 1) % inputInterval;
+    if (inputCounter === 0) { network.feedForward(Math.random()); }
 
     network.update();
-    network.display(ctx);
+    for (var i = 0; i < generatorsLength; i++) {
+        generators[i].update();
+    }
+};
 
-    generators.forEach(function(generator) {
-        generator.update();
-        generator.display(ctx);
-    });
+var render = function(ctx) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+
+    network.display(ctx);
+    for (var i = 0; i < generatorsLength; i++) {
+        generators[i].display(ctx);
+    }
 
     ctx.restore();
+};
 
-    window.requestAnimationFrame(update);
-}());
+// game loop from: http://codeincomplete.com/posts/2013/12/4/javascript_game_foundations_the_game_loop/
+function timestamp() {
+  return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+}
+
+function run(options) {
+    var now,
+        dt       = 0,
+        last     = timestamp(),
+        slow     = options.slow || 1, // slow motion scaling factor
+        step     = 1/options.fps,
+        slowStep = slow * step,
+        update   = options.update,
+        render   = options.render,
+        stats    = new Stats();
+
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.right = '0px';
+        stats.domElement.style.bottom = '0px';
+        document.body.appendChild(stats.domElement);
+
+    function frame() {
+        stats.begin();
+        now = timestamp();
+        dt = dt + Math.min(1, (now - last) / 1000);
+        while(dt > slowStep) {
+            dt = dt - slowStep;
+            update(step);
+        }
+        render(ctx, dt/slow);
+        last = now;
+        stats.end();
+        requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+}
+
+run({
+    fps: 60,
+    slow: 1,
+    update: update,
+    render: render
+});
 
