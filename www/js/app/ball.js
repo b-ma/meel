@@ -3,16 +3,16 @@ var events = require('events')
   , _ = require('underscore')
   , Vector = require('vector')
   , helpers = require('../lib/canvas-helpers')
+  , ui = require('./models/ui-model')
 ;
 
 var Ball = function(position, value) {
     this.position = position;
-    this.strength = value;
-    this.gravity = new Vector(0, 0.1);
+    this.strength = value; // is always > 1 and between [1, 2]
+    this.speed = new Vector(0, this.strength * 6.8);
 
     this.dead = false;
     this.lifeTime = 1;
-    this.speed = new Vector(0, this.strength * 3 + 2);
     this.lastSpeed = new Vector(0, 0);
 
     events.EventEmitter.call(this);
@@ -28,27 +28,24 @@ _.extend(Ball.prototype, {
         return this.dead;
     },
 
-    update: function() {
+    update: function(dt) {
+        var gravity = new Vector(0, ui.get('gravity'));
+
         if (this.position.y >= 0) {
             this.speed.multiply(-0.8);
             this.bounces++;
             this.emit('bounce', this.strength * this.lifeTime, this.bounces);
         }
 
-        this.speed.add(this.gravity);
+        this.speed.add(gravity.multiply(dt));
         this.position.add(this.speed);
 
         if (this.position.y > 0) {
             this.position.y = 0;
         }
 
-        // if (this.lastSpeed && Math.abs(this.lastSpeed.y - this.speed.y) < 0.05) {
-        //     this.dead = true;
-        // }
         this.lifeTime -= 0.005;
-        if (this.lifeTime < 0) {
-            this.dead = true;
-        }
+        if (this.lifeTime < 0) { this.dead = true; }
 
         this.lastSpeed = this.speed.clone();
     },

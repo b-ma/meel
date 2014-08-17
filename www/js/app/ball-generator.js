@@ -27,12 +27,12 @@ _.extend(BallGenerator.prototype, {
         this.emit('bounce', this.frequency, bounceCount, strength, this.position);
     },
 
-    update: function() {
+    update: function(dt) {
         var deadBalls = [];
         // check dead balls
         this.balls.forEach(function(ball, i) {
             if (ball.isDead()) { return deadBalls.push(i); }
-            ball.update();
+            ball.update(dt);
         });
 
         deadBalls.forEach(function(index) {

@@ -30,7 +30,9 @@ function Connection(source, dest) {
 
     events.EventEmitter.call(this);
 
-    this.messageTimeStep = Math.random() * 0.008 + 0.004 ;
+    // assuming connection are 1 meter, set a maxspeed of 0.5 meter / s
+    this.messageVelocity = Math.random() * 0.25 + 0.25;
+
     this.h = this.source.position.y - this.dest.position.y;
 
     this.color = {
@@ -80,13 +82,16 @@ _.extend(Connection.prototype, {
         this.messages.push(message);
     },
 
-    update: function() {
+    update: function(dt) {
         // update control points
         this.updateControlPoints();
+        // update velocity of the connection for this frame
+        var messageVelocity = this.messageVelocity + ui.get('messageAcceleration');
+
 
         var deadMessages = [];
         this.messages.forEach(function(message) {
-            message.timer += this.messageTimeStep;
+            message.timer += messageVelocity * dt;
 
             if (message.timer >= 1) { return deadMessages.push(message); }
 

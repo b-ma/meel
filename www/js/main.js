@@ -115,34 +115,6 @@ UIModel.on('change:inputPosition', function(ratio) {
     inputPosition.x = (networkWidth * ratio) - (networkWidth / 2);
 });
 
-// main loop
-var inputInterval = 4;
-var inputCounter = 0;
-var generatorsLength = generators.length;
-
-var update = function() {
-    inputCounter = (inputCounter + 1) % inputInterval;
-    if (inputCounter === 0) { network.feedForward(Math.random()); }
-
-    network.update();
-    for (var i = 0; i < generatorsLength; i++) {
-        generators[i].update();
-    }
-};
-
-var render = function(ctx) {
-    ctx.clearRect(0, 0, w, h);
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-
-    network.display(ctx);
-    for (var i = 0; i < generatorsLength; i++) {
-        generators[i].display(ctx);
-    }
-
-    ctx.restore();
-};
-
 // game loop from: http://codeincomplete.com/posts/2013/12/4/javascript_game_foundations_the_game_loop/
 function timestamp() {
   return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
@@ -168,11 +140,13 @@ function run(options) {
         stats.begin();
         now = timestamp();
         dt = dt + Math.min(1, (now - last) / 1000);
+
         while(dt > slowStep) {
             dt = dt - slowStep;
             update(step);
         }
-        render(ctx, dt/slow);
+
+        render(ctx);
         last = now;
         stats.end();
         requestAnimationFrame(frame);
@@ -181,9 +155,39 @@ function run(options) {
     requestAnimationFrame(frame);
 }
 
+
+// update - render
+var inputInterval = 2;
+var inputCounter = 0;
+var generatorsLength = generators.length;
+
+var update = function(dt) {
+    inputCounter = (inputCounter + 1) % inputInterval;
+    if (inputCounter === 0) { network.feedForward(Math.random()); }
+
+    network.update(dt);
+    for (var i = 0; i < generatorsLength; i++) {
+        generators[i].update(dt);
+    }
+};
+
+var render = function(ctx) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+
+    network.display(ctx);
+    for (var i = 0; i < generatorsLength; i++) {
+        generators[i].display(ctx);
+    }
+
+    ctx.restore();
+};
+
+// launch loop
 run({
     fps: 60,
-    slow: 1,
+    // slow: 50,
     update: update,
     render: render
 });

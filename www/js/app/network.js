@@ -56,10 +56,10 @@ _.extend(Network.prototype, {
         this.input.feedForward(message);
     },
 
-    update: function() {
+    update: function(dt) {
         var length = this.neurons.length;
         for (var i = 0; i < length; i++) {
-            this.neurons[i].update();
+            this.neurons[i].update(dt);
         };
     },
 

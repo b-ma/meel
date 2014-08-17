@@ -5,6 +5,16 @@ var events = require('events')
 ;
 
 var settings = {
+    messageAcceleration: {
+        default: 0.1,
+        range: [-0.5, 0.5],
+        folder: 'display'
+    },
+    gravity: {
+        default: 9.81,
+        range: [5, 16],
+        folder: 'display'
+    },
     inputPosition: {
         default: 0.5,
         range: [0, 1],
@@ -72,6 +82,7 @@ var UIModel = function() {
     }, this);
 
     events.EventEmitter.call(this);
+    this.setMaxListeners(1000);
 };
 
 util.inherits(UIModel, events.EventEmitter);
@@ -102,6 +113,6 @@ _.each(settings, function(setting, attr) {
     controllers[attr].onChange(function(value) { uiModel.set(attr, value); })
 });
 
-gui.close();
+// gui.close();
 
 module.exports = uiModel;
