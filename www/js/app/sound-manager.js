@@ -11,7 +11,7 @@ var frequencies = {
     'g': 98
 };
 
-var AudioContext = window.audioContext || window.webkitAudioContext;
+var AudioContext = window.AudioContext || window.webkitAudioContext;
 
 var audio = new AudioContext();
 var master = audio.createGain();
