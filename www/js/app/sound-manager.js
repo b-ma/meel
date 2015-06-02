@@ -22,36 +22,46 @@ var lowFilter = audio.createBiquadFilter();
 lowFilter.frequency.value = 22000.0;
 lowFilter.Q.value = 5.0;
 
+// initalize audio
+var sin = audio.createOscillator();
+sin.frequency.value = 300;
+var gain = audio.createGain();
+gain.gain.value = 0;
+sin.connect(gain);
+gain.connect(audio.destination);
+
+sin.start(0);
+sin.stop(audio.currentTime + 0.01);
+
 // build graph
-master.connect(compressor);
-lowFilter.connect(compressor);
-compressor.connect(volume);
+// master.connect(compressor);
+// lowFilter.connect(compressor);
+// compressor.connect(volume);
+master.connect(volume);
 volume.connect(audio.destination);
 
 var playSound = function(frequency, bounceCount, strength, position) {
     if (frequency > 22000 || frequency < 100) { return; }
-
     // phasing
     var interval = frequency * (2 / 440);
     var frequency = frequency + bounceCount * (interval * UIModel.get('phasing') * Math.random() - interval);
 
-    var now = audio.currentTime;
     var oscillator = audio.createOscillator();
     var gainNode = audio.createGain();
     var panner = audio.createPanner();
 
     oscillator.frequency.value = frequency;
-    var spatialize = UIModel.get('spatialize') + (Math.random() * 0.1);
-    panner.setPosition(position.x * spatialize, position.y * spatialize, strength * -100 * spatialize);
+    var spatialize = UIModel.get('spatialize');
+    panner.setPosition(position.x * spatialize / 5, position.y * spatialize / 5, strength * -1 * spatialize);
 
-    var ratio = 1 - ((frequency / 22000) * 0.6);
-    // change adsr according to frequency
-    // var ratio = frequency > 2000 ? 0.3 : frequency > 2000 ? 1 : 1.4;
+    var ratio = 1 - ((frequency / 22000) * 0.6); // what's that ?
     // ADSR
+    var now = audio.currentTime;
+    // console.log(strength * 0.25 * ratio, 0.05 * ratio);
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(strength * 0.25 * ratio, now + 0.04);
+    gainNode.gain.linearRampToValueAtTime(strength * 0.25 * ratio, now + 0.02);
     gainNode.gain.setTargetAtTime(0.05 * ratio, now + 0.5, 0.5);
-    gainNode.gain.setTargetAtTime(0, now + 6, 0.8);
+    gainNode.gain.setTargetAtTime(0.0001, now + 6, 0.8);
 
     oscillator.connect(panner);
     panner.connect(gainNode);
@@ -60,8 +70,15 @@ var playSound = function(frequency, bounceCount, strength, position) {
     oscillator.start(now);
     oscillator.stop(now + 10);
 
-    gainNode = null;
-    oscillator = null;
+    // clean graph
+    (function(oscillator, panner, gainNode) {
+      setTimeout(function() {
+        oscillator.disconnect();
+        panner.disconnect();
+        gainNode.disconnect();
+        oscillator = panner = gainNode = null;
+      }, 10 * 1000);
+    } (oscillator, panner, gainNode));
 };
 
 // gui

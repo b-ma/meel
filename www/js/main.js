@@ -103,12 +103,16 @@ for (var i = 0; i < neuronCount; i++) {
     var generator = new BallGenerator(location, frequencies[index]);
 
     generator.on('bounce', function() {
-        soundManager.play.apply(soundManager, arguments);
+      soundManager.play.apply(soundManager, arguments);
     });
 
     network.setOutput(thirdLayer[i], generator);
     generators.push(generator);
 }
+
+// document.querySelector('#trigger').addEventListener('click', function() {
+//   soundManager.play(400, 1, 0.6, {x: -243.16977225672875, y: -100.16666666666667})
+// });
 
 // move inputPosition
 UIModel.on('change:inputPosition', function(ratio) {
@@ -128,16 +132,16 @@ function run(options) {
         step     = 1/options.fps,
         slowStep = slow * step,
         update   = options.update,
-        render   = options.render,
-        stats    = new Stats();
-
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.right = '0px';
-        stats.domElement.style.bottom = '0px';
-        document.body.appendChild(stats.domElement);
+        render   = options.render
+        // stats    = new Stats();
+    ;
+        // stats.domElement.style.position = 'absolute';
+        // stats.domElement.style.right = '0px';
+        // stats.domElement.style.bottom = '0px';
+        // document.body.appendChild(stats.domElement);
 
     function frame() {
-        stats.begin();
+        // stats.begin();
         now = timestamp();
         dt = dt + Math.min(1, (now - last) / 1000);
 
@@ -148,7 +152,7 @@ function run(options) {
 
         render(ctx);
         last = now;
-        stats.end();
+        // stats.end();
         requestAnimationFrame(frame);
     }
 

@@ -31,7 +31,7 @@ var settings = {
         folder: 'display'
     },
     volume: {
-        default: 0.7,
+        default: 0.9,
         range: [0, 1],
         folder: 'sound'
     },
@@ -101,17 +101,17 @@ UIModel.prototype.get = function(attr) {
 var uiModel = new UIModel();
 
 // GUI
-var gui = f1 = new dat.GUI();
-var controllers = {};
-// display settings
-var folders = {};
-folders['display'] = gui.addFolder('display settings');
-folders['sound'] = gui.addFolder('sound settings');
+// var gui = f1 = new dat.GUI();
+// var controllers = {};
+// // display settings
+// var folders = {};
+// folders['display'] = gui.addFolder('display settings');
+// folders['sound'] = gui.addFolder('sound settings');
 
-_.each(settings, function(setting, attr) {
-    controllers[attr] = folders[setting.folder].add(uiModel, attr, setting.range[0], setting.range[1]);
-    controllers[attr].onChange(function(value) { uiModel.set(attr, value); })
-});
+// _.each(settings, function(setting, attr) {
+//     controllers[attr] = folders[setting.folder].add(uiModel, attr, setting.range[0], setting.range[1]);
+//     controllers[attr].onChange(function(value) { uiModel.set(attr, value); })
+// });
 
 // gui.close();
 
